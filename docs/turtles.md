@@ -16,12 +16,26 @@
 
 * Ros2 - jazzy
 ```bash
-docker run --name <felipe-ros2> osrf/ros:jazzy-desktop
+docker run osrf/ros:jazzy-desktop
+
 docker ps --all
-docker commit <houno8nq0hw89nh0> <test-ros-2>
-docker run -it <test-ros-2>
+# Copy the ID from the container you have just created
+docker commit <houno8nq0hw89nh0> <my-ros-2>
+
+docker run -it <my-ros-2>
 docker ps --all
-docker start -ia <quirky_sammet>
+# Copy the name from the new container
+docker rename <quirky_sommet> ros
+
+docker start -ia ros
+
+docker ps --all
+# Remove the unused container
+docker rm <gracious_golick>
 ```
 
-To come back to the last "VM", repeat the last step.
+To come back to the last "VM", `docker start -ia ros`
+
+Another option:
+docker start ros 
+docker exec -it ros bash # TO go back to it
