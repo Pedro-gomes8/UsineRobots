@@ -41,6 +41,7 @@ Holidays
 ## André 
 ROS installation
 SYSML validation and fixes
+Petri network
 
 ## Felipe
 Read ROS documentation.
