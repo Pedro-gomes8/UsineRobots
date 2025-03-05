@@ -1,4 +1,4 @@
-# Trutlebot stack Installation guide
+# Turtlebot stack Installation guide
 
 ## Context
 
@@ -34,3 +34,13 @@ Beware this might take up to an hour to run. You could try running it on your de
 ```bash
 docker build -t ingot/turtlebot2-ros-iron:desktop -f turtlebot2_ros2.dockerfile --build-arg from_image=osrf/ros:iron-desktop --build-arg parallel_jobs=4 --platform linux/amd64 .
 ```
+If you decide to compile on the desktop, you can transfer the image to the raspberry through a file.
+```bash
+docker save -o image.tar <image id>
+```
+
+After [transfering](https://stackoverflow.com/a/26226261/15000482) it to the Raspberry, load it. I recommend putting it on a USB drive instead ou the SD itself, so that you can do this in just 16GiB.
+```bash
+docker load -i image.tar
+```
+If you mess up, [this answer](https://stackoverflow.com/questions/45798076/how-to-clean-up-docker) tells you how to clean up docker and free up some space. 
