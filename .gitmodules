@@ -1,3 +1,4 @@
 [submodule "turtlebot2_ros2_rasp3"]
 	path = turtlebot2_ros2_rasp3
 	url = https://github.com/Felipe-noob/turtlebot2_ros2_rasp3
+	branch = main
