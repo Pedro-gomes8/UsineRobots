@@ -1,6 +1,5 @@
 
-
-# arm_node
-armnode/build/
-armnode/install/
-armnode/log/
+# Colcon build files 
+build
+install
+log
