@@ -57,4 +57,26 @@ Petri network
 Read ROS documentation.
 
 # 2025-03-03 to 2025-03-09
+
+## André
+
+## Felipe
+
+* The robot is able to move using ros-iron-desktop image.
+* The jazzy and iron images have been tested, and they can be installed on the robot but cannot send commands for some reason. They do not work with the bridge.
+* Found tutorials for the Kinect v1 (Xbox 360)
+* Install ROS on the netbook
+
+## Pedro
+
+* Change camera model due to availability
+
+## Oreste
+
+
+
+## Gabriel
+
+* Implement Simulation with Simulink and Gazebo.
+
 # 2025-03-10 to 2025-03-16
