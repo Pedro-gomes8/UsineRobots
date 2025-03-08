@@ -92,22 +92,18 @@ int endResourceDataBase(ResourceDataBase_t* database){
 int attemptLockResource(ResourceDataBase_t *database, int ressourceId, int requesterId) {
   // ressource Id out of bounds
   if (ressourceId < 0 || ressourceId >= MAX_RESOURCE_ID) {
-    cout<< "resource Id out of bounds"<< endl;
     return -1;
   }
 
   // if ressource is not registered, register it
   if (!database->registered[ressourceId]) {
-    cout<< "new resource registered "<< endl;
     (void)registerResource(database, ressourceId);
   }
 
   if(database->availability[ressourceId] < 1){
-    cout<< "resource unavailable "<< endl;
     return -1;
   }
 
-  cout<< "resource locked "<< endl;
   database->availability[ressourceId] -= 1;
   database->owner[ressourceId] = requesterId;
   return 0;
@@ -124,19 +120,16 @@ int attemptLockResource(ResourceDataBase_t *database, int ressourceId, int reque
  */
 int releaseResource(ResourceDataBase_t *database, int ressourceId, int requesterId) {
   if (database->availability[ressourceId] == 1){
-    cout << "[release]resource not locked";
     return -1;
   }
 
   // only the owner can unlock it
   if(requesterId != database->owner[ressourceId]){
-    cout << "[release]wrong owner";
     return -1;
   }
 
   // if ressource is not registered, return error
   if (!database->registered[ressourceId]) {
-    cout << "[release]resource not registered";
     return -1;
   }
 
@@ -157,8 +150,6 @@ int releaseResource(ResourceDataBase_t *database, int ressourceId, int requester
  * @return 0 when the resource becomes available, or a negative value on failure.
  */
 int waitResource(ResourceDataBase_t* database, int ressourceId){
-  cout<<"waiting for resource "<< ressourceId << endl;
-  fflush(stdout);
   return sem_wait(&(database->interest[ressourceId]));
 }
 

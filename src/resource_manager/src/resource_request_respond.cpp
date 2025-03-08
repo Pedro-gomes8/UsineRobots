@@ -27,7 +27,6 @@ int respondRequest(ResourceDataBaseProxy_t* safeDatabase,
   fflush(stdout);
   switch(reqType){
     case LOCK_REQUEST:
-      cout<< "test" << endl;
       waitRes = waitResourceProxy(safeDatabase, resource);
       if(waitRes != 0){
         res = waitRes;

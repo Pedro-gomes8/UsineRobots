@@ -20,7 +20,14 @@ int main(int argc, char ** argv)
   shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("resource_manager");
 
 
+  // initializes database
   ResourceDataBaseProxy_t* safeDatabase = initResourceDatabaseProxy();
+
+  // Create a reentrant callback group to allow concurrent execution.
+  auto callback_group = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+
+  // creates the standard profile for the service
+  auto qos_profile = rclcpp::QoS(rclcpp::ServicesQoS());
 
   // Create the service using a lambda function as the callback
   auto service = node->create_service<resource_manager::srv::RequestResource>(
@@ -36,7 +43,6 @@ int main(int argc, char ** argv)
       int requesterId = request->a;
       int reqResource = request->b;
       enum ResourceRequestType_e reqType = static_cast<ResourceRequestType_e>(request->c);
-      cout << reqType << endl;
 
       // Process the request
       response->resp = respondRequest(safeDatabase, reqResource,requesterId,  reqType);
@@ -44,9 +50,12 @@ int main(int argc, char ** argv)
       // Log the response
       RCLCPP_INFO(rclcpp::get_logger("rclcpp"),
                   "Sending response: resp=%d", response->resp);
-    }
+    },
+    qos_profile,
+    callback_group
   );
 
+  // makes it so responses to call back CAN BE executed in parallel
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(node);
 

@@ -41,6 +41,7 @@ int endResourceDataBase(ResourceDataBase_t* database);
  *
  * @param[in] database Pointer to the resource database instance.
  * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] requesterId ID of who is requesting the resource
  * @return 0 if the lock was acquired successfully, or a negative value on failure.
  */
 int attemptLockResource(ResourceDataBase_t* database, int ressourceId, int requesterId);
@@ -52,6 +53,7 @@ int attemptLockResource(ResourceDataBase_t* database, int ressourceId, int reque
  *
  * @param[in] database Pointer to the resource database instance.
  * @param[in] ressourceId ID of the resource to release.
+ * @param[in] requesterId ID of who is requesting the resource
  * @return 0 on success, or a negative value on failure.
  */
 int releaseResource(ResourceDataBase_t* database, int ressourceId, int requesterId);
