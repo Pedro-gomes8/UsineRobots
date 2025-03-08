@@ -1,3 +1,4 @@
+#include <iostream>
 #include <err.h>
 #include <semaphore.h>
 #include <stdlib.h>
@@ -69,14 +70,15 @@ int endResourceDataBaseProxy(ResourceDataBaseProxy_t* dbProxy){
  * @return 0 if the lock was acquired successfully, or a negative value on failure.
  */
 int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
-                              int ressourceId) {
+                              int ressourceId, int requesterId) {
   sem_wait(&db_proxy->lock);
-  if (!attemptLockResource(db_proxy->database, ressourceId)) {
-    return -1;
+  int res = 0;
+  if (attemptLockResource(db_proxy->database, ressourceId, requesterId) != 0) {
+    res = -1;
   }
 
   sem_post(&db_proxy->lock);
-  return 0;
+  return res;
 }
 
 /**
@@ -88,10 +90,10 @@ int attemptLockResourceProxy(ResourceDataBaseProxy_t* db_proxy,
  * @param[in] ressourceId ID of the resource to release.
  * @return 0 on success, or a negative value on failure.
  */
-int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId) {
+int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId, int requesterId) {
   sem_wait(&db_proxy->lock);
 
-  int res = releaseResource(db_proxy->database, ressourceId);
+  int res = releaseResource(db_proxy->database, ressourceId, requesterId);
 
   sem_post(&db_proxy->lock);
   return res;

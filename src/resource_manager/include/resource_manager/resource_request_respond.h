@@ -8,12 +8,10 @@ enum ResourceRequestType_e {
   RELEASE_REQUEST
 };
 
-typedef struct ResopondRequestData_t ResopondRequestData_t;
+typedef struct RespondRequestData_t RespondRequestData_t;
 
-void* respondRequest(void* data);
+int respondRequest(ResourceDataBaseProxy_t* safeDatabase,
+                    int resource, int requesterId, enum ResourceRequestType_e reqType);
 
-ResopondRequestData_t* bundleData(ResourceDataBaseProxy_t* safeDatabase,
-                                  int requesterId,int resource,
-                                  enum ResourceRequestType_e reqType);
 
 #endif // RESOURCE_REQUEST_RESPOND_H_
