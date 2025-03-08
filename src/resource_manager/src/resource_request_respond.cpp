@@ -6,6 +6,19 @@
 
 using namespace std;
 
+/**
+ * @brief Processes a resource request.
+ *
+ * Handles a request to either lock or release a resource, ensuring safe access
+ * via the resource database proxy.
+ *
+ * @param[in] safeDatabase Pointer to the resource database proxy instance.
+ * @param[in] resource ID of the resource to be processed.
+ * @param[in] requesterId ID of the requester.
+ * @param[in] reqType Type of request (LOCK_REQUEST or RELEASE_REQUEST).
+ * @return 0 on success, or a negative value on failure.
+ * @note calls to this function MAY be blocking
+ */
 int respondRequest(ResourceDataBaseProxy_t* safeDatabase,
                     int resource, int requesterId, enum ResourceRequestType_e reqType){
 
@@ -34,49 +47,3 @@ int respondRequest(ResourceDataBaseProxy_t* safeDatabase,
 
   return res;
 }
-
-/*
-struct RespondRequestData_t{
-  ResourceDataBaseProxy_t* safeDatabase;
-  int requesterId;
-  int resource;
-  enum ResourceRequestType_e reqType;
-  pthread_t tid;
-};
-
-RespondRequestData_t* bundleRespondRequestData(ResourceDataBaseProxy_t* safeDatabase,
-                                  int requesterId,int resource,
-                                  enum ResourceRequestType_e reqType);
-
-void* respondRequestThread(void* data);
-
-RespondRequestData_t* bundleRespondRequestData(ResourceDataBaseProxy_t* safeDatabase,
-                                  int requesterId,int resource,
-                                  enum ResourceRequestType_e reqType){
-
- RespondRequestData_t* data = (RespondRequestData_t*) malloc(sizeof(RespondRequestData_t));
-
- data->safeDatabase = safeDatabase;
- data->requesterId = requesterId;
- data->resource = resource;
- data->reqType = reqType;
-
- return data;
-}
-void* respondRequestThread(void* data){
-  RespondRequestData_t* typedData = ( RespondRequestData_t* ) data;
-
-  (void)pthread_detach(typedData->tid);
-  ResourceDataBaseProxy_t* safeDatabase = typedData->safeDatabase;
-  int requesterId = typedData->requesterId;
-  int resource = typedData->resource;
-  enum ResourceRequestType_e reqType = typedData->reqType;
-
-  // send message back
-
-  free(data);
-
-  pthread_exit(NULL);
-}
-
- */
