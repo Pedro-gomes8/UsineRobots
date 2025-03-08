@@ -3,3 +3,6 @@
 build
 install
 log
+
+# Python cache
+__pycache__
