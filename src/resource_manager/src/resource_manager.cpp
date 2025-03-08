@@ -35,14 +35,15 @@ int main(int argc, char ** argv)
     [safeDatabase](const std::shared_ptr<resource_manager::srv::RequestResource::Request> request,
        std::shared_ptr<resource_manager::srv::RequestResource::Response> response) -> void
     {
-      // Log the received request
-      RCLCPP_INFO(rclcpp::get_logger("rclcpp"),
-                  "Received request: a=%d, b=%d, c=%d", request->a, request->b, request->c);
 
       // change to listen on ros topic
-      int requesterId = request->a;
-      int reqResource = request->b;
-      enum ResourceRequestType_e reqType = static_cast<ResourceRequestType_e>(request->c);
+      int requesterId = request->requester;
+      int reqResource = request->resource;
+      enum ResourceRequestType_e reqType = static_cast<ResourceRequestType_e>(request->type);
+
+      // Log the received request
+      RCLCPP_INFO(rclcpp::get_logger("rclcpp"),
+                  "Received request: requester=%d, resourceId=%d, reqType=%d", requesterId, reqResource, reqType);
 
       // Process the request
       response->resp = respondRequest(safeDatabase, reqResource,requesterId,  reqType);

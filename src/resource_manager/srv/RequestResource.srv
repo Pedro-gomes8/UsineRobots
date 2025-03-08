@@ -1,5 +1,5 @@
-int32 a
-int32 b
-int32 c
+int32 requester
+int32 resource
+int32 type
 ---
 int32 resp
