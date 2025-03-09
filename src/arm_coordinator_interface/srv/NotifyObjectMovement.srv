@@ -1,0 +1,5 @@
+int32 turtle_id
+int32 obj_diff
+string object_color
+---
+int32 ack
