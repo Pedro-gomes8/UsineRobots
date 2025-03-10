@@ -6,8 +6,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-#include "coordinator/turtle_proxy.h"
-#include "coordinator/coordinator.h"
+#include "coordinator.hpp"
 
 using namespace std;
 
@@ -18,13 +17,11 @@ int main(int argc, char ** argv)
 
     // Create a reentrant callback group to allow concurrent execution.
 
-    shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("coordinator");
+    shared_ptr<Coordinator> node = std::make_shared<Coordinator>();
 
-    Coordinator coord;
+    //coord.createTurtleServices(node);
 
-    coord.createTurtleServices(node);
-
-    coord.createArmServices(node);
+    //coord.createArmServices(node);
 
     // allows for callbacks to be executed in parallel
     rclcpp::executors::MultiThreadedExecutor executor;
@@ -32,7 +29,7 @@ int main(int argc, char ** argv)
 
     executor.spin();
 
-    coord.sendSetupMessages(node);
+    //coord.sendSetupMessages(node);
 
     // send permission message to arm robot
 

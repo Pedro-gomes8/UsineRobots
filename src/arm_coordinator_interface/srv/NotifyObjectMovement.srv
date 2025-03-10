@@ -3,3 +3,5 @@ int32 obj_diff
 string object_color
 ---
 int32 ack
+
+# ack = 1 if turtle left, ack = 0 if turtle stayed, else ack < 0 error

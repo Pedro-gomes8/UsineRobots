@@ -1,40 +1,52 @@
-#include "coordinator.h"
+#include "coordinator.hpp"
+#include "turtle_proxy.hpp"
+#include <memory>
+#include <thread>
+#include <iostream>
+#include <cstdio>
+#include <functional>
 
-#include "arm_coordinator_interface/srv/NotifyObjectMovement"
-#include "arm_coordinator_interface/srv/NotifyArmFinished"
-#include "arm_coordinator_interface/srv/NotifyTurtleStateChange"
-#include "arm_coordinator_interface/srv/InputArmSetup"
 
-#include "turtle_coordinator_interface/srv/NotifyTurtleArrival"
-#include "turtle_coordinator_interface/srv/NotifyTurtleInitialPosition"
-#include "turtle_coordinator_interface/msg/TurtleMove"
+using namespace std;
 
-using NotifyObjectMovement = arm_coordinator_interface::srv::NotifyObjectMovement;
-using NotifyArmFinished = arm_coordinator_interface::srv::NotifyArmFinished;
-using NotifyTurtleStateChange = arm_coordinator_interface::srv::NotifyTurtleStateChange;
-using InputArmSetup = arm_coordinator_interface::srv::InputArmSetup;
+void notifyTurtleArrivalCallback(const std::shared_ptr<NotifyTurtleArrival::Request> request,
+        std::shared_ptr<NotifyTurtleArrival::Response> response);
 
-using NotifyTurtleArrival = turtle_coordinator_interface::srv::NotifyTurtleArrival;
-using NotifyTurtleInitialPosition = turtle_coordinator_interface::srv::NotifyTurtleInitialPosition;
-using TurtleMove = turtle_coordinator_interface::msg::TurtleMove;
+void notifyTurtleInitialPositionCallback(const std::shared_ptr<NotifyTurtleInitialPosition::Request> request,
+        std::shared_ptr<NotifyTurtleInitialPosition::Response> response);
 
-int Coordinator::sendSetupMessages(shared_ptr<rclcpp::Node> node, Coordinator coord){
+void notifyObjectMovementCallback(const std::shared_ptr<NotifyObjectMovement::Request> request,
+        std::shared_ptr<NotifyObjectMovement::Response> response);
+
+void notifyArmFinishedCallback(const std::shared_ptr<NotifyArmFinished::Request> request,
+        std::shared_ptr<NotifyArmFinished::Response> response);
+
+Coordinator::Coordinator(): Node("Coordinator"){
+        // Create a callback group
+        service_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+
+        (void)this->createArmServices();
+        (void)this->createTurtleServices();
+        (void)this->sendSetupMessages();
+
+        RCLCPP_INFO(this->get_logger(), "Service is ready.");
+}
+
+int Coordinator::sendSetupMessages(){
     return -1;
 }
 
-int Coordinator::createTurtleServices(shared_ptr<rclcpp::Node> node, Coordinator coord){
+int Coordinator::createTurtleServices(){
     //==========================================================================
     //================ Notify Turtle Arrival Service ==========================
     //==========================================================================
-    auto turtleArrivalCallbackGroup = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-
     auto qos_profile = rclcpp::QoS(rclcpp::ServicesQoS());
 
-    auto turtleArrivalService = node->create_service<NotifyTurtleArrival>(
+    turtleArrivalService = this->create_service<NotifyTurtleArrival>(
         "notify_turtle_arrival",
-        bind(notifyTurtleArrivalCallback,placeholders::_1,placeholders::_2,placeholders::_3,coordinator),
+        notifyTurtleArrivalCallback,
         qos_profile,
-        turtleArrivalCallbackGroup
+        service_callback_group_
     );
 
     //==========================================================================
@@ -42,60 +54,107 @@ int Coordinator::createTurtleServices(shared_ptr<rclcpp::Node> node, Coordinator
     //==========================================================================
 
 
-    auto turtleInitialPositionCallbackGroup = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-
-    auto turtleInitialPositionService = node->create_service<NotifyObjectMovement>(
+    turtleInitialPositionService = this->create_service<NotifyTurtleInitialPosition>(
         "notify_turtle_initial_position",
-        bind(notifyTurtleInitialPositionCallback,placeholders::_1,placeholders::_2,placeholders::_3,coordinator),
+        notifyTurtleInitialPositionCallback,
         qos_profile,
-        turtleInitialPositionCallbackGroup
+        service_callback_group_
     );
 
     return 0;
 }
 
-int Coordinator::createArmServices(shared_ptr<rclcpp::Node> node, Coordinator coord){
-
-    //==========================================================================
-    //================ Notify Turtle State Change Service ======================
-    //==========================================================================
-    auto turtleStateChangeCallbackGroup = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-
+int Coordinator::createArmServices(){
     auto qos_profile = rclcpp::QoS(rclcpp::ServicesQoS());
-
-    auto turtleStateChangeService = node->create_service<NotifyTurtleStateChange>(
-        "notify_turtle_state_change",
-        bind(notifyTurtleStateChangeCallback,placeholders::_1,placeholders::_2,placeholders::_3,coordinator),
-        qos_profile,
-        turtleStateChangeCallbackGroup
-    );
 
     //==========================================================================
     //==================== Notify Object Movement Service ======================
     //==========================================================================
 
 
-    auto objectMovementCallbackGroup = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-
-    auto objectMovementService = node->create_service<NotifyObjectMovement>(
+    objectMovementService = this->create_service<NotifyObjectMovement>(
         "notify_object_movement",
-        bind(notifyObjectMovementCallback,placeholders::_1,placeholders::_2,placeholders::_3,coordinator),
+        notifyObjectMovementCallback,
         qos_profile,
-        objectMovementCallbackGroup
+        service_callback_group_
     );
 
     //==========================================================================
     //==================== Notify Arm Finished =================================
     //==========================================================================
 
-    auto armFinishedCallbackGroup = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-
-    auto armFinishedService = node->create_service<NotifyArmFinished>(
+    armFinishedService = this->create_service<NotifyArmFinished>(
         "notify_arm_finished",
-        bind(notifyArmFinishedCallback,placeholders::_1,placeholders::_2,placeholders::_3,coordinator),
+        notifyArmFinishedCallback,
         qos_profile,
-        armFinishedCallbackGroup
+        service_callback_group_
     );
 
     return 0;
+}
+
+void notifyTurtleArrivalCallback(const std::shared_ptr<NotifyTurtleArrival::Request> request,
+        std::shared_ptr<NotifyTurtleArrival::Response> response){
+    // TODO: select connecting turtle through request->turtleId
+    TurtleProxy turtle = this->registeredTurtles.find(request->turtleId);
+    enum TurtlePosition_e newTurtlePosition = static_cast<TurtlePosition_e>(request->turtlePosition);
+
+    // updating turtles position
+    turtle->changeTurtlePosition(newTurtlePosition);
+
+    response->ack = 0;
+}
+
+void notifyTurtleInitialPositionCallback(const std::shared_ptr<NotifyTurtleInitialPosition::Request> request,
+        std::shared_ptr<NotifyTurtleInitialPosition::Response> response){
+    // Creating a new turtle proxy
+    enum TurtlePosition_e newTurtlePosition = static_cast<TurtlePosition_e>(request->turtlePosition);
+    int newId = -1; // TODO: generate new id
+    TurtleProxy newTurtle = TurtleProxy(newTurtlePosition, NO_COLOR, MAX_TURTLE_CAPACITY);
+
+    // TODO: include into turtle proxy map
+    this->registeredTurtles.insert({newId, newTurtle});
+
+    // respond with turtle's id
+    response->turtleId = newId;
+
+}
+
+void notifyObjectMovementCallback(const std::shared_ptr<NotifyObjectMovement::Request> request,
+        std::shared_ptr<NotifyObjectMovement::Response> response){
+    TurtleProxy turtle = this->registeredTurtles.find(request->turtleId);
+
+    // if not already done, set color of turtle proxy to request->objectColor
+    if(turtle.cargoHasColor(NO_COLOR)){
+        turtle.changeCargoType(request->objectColor);
+    }
+
+    //check if turtle has the same color of the new object
+    if(!turtle.cargoHasColor(request->objectColor)){
+        // if color is different, return an error
+        response->ack = -1;
+        return;
+    }
+
+    turtle.changeCargoAmmount(request->objDiff);
+    if(turtle.isFull()){
+        //TODO: send to the OUTPUT side
+        response->ack = 1;
+    }
+
+    else if(turtle.isEmpty()){
+        //TODO: send to the INPUT side
+        response->ack = 1;
+    }
+
+    else{
+        response->ack = 0;
+    }
+
+}
+
+void notifyArmFinishedCallback(const std::shared_ptr<NotifyArmFinished::Request> request,
+                               std::shared_ptr<NotifyArmFinished::Response> response){
+    // TODO: what do I do with this information ???
+    response->ack = 0;
 }

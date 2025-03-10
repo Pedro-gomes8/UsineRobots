@@ -1,4 +1,0 @@
-int32 turtle_id
-int32 new_turtle_state
----
-int32 ack
