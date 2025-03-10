@@ -19,17 +19,13 @@ int main(int argc, char ** argv)
 
     shared_ptr<Coordinator> node = std::make_shared<Coordinator>();
 
-    //coord.createTurtleServices(node);
-
-    //coord.createArmServices(node);
-
     // allows for callbacks to be executed in parallel
     rclcpp::executors::MultiThreadedExecutor executor;
     executor.add_node(node);
 
     executor.spin();
 
-    //coord.sendSetupMessages(node);
+    (void)node->sendSetupMessages();
 
     // send permission message to arm robot
 

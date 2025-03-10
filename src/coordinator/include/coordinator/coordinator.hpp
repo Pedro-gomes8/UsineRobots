@@ -1,3 +1,9 @@
+/**
+ * @file coordinator.hpp
+ * @brief class to define the coordinator object.
+ *
+ * This module defines all the functions to setup the coordinator
+ */
 #ifndef COORDINATOR_H_
 #define COORDINATOR_H_
 
@@ -24,16 +30,85 @@ using NotifyTurtleArrival = turtle_coordinator_interface::srv::NotifyTurtleArriv
 using NotifyTurtleInitialPosition = turtle_coordinator_interface::srv::NotifyTurtleInitialPosition;
 using TurtleMove = turtle_coordinator_interface::msg::TurtleMove;
 
+
+/**
+ * @brief This class manages the coordination of turtle services and their integration with the system.
+ */
 class Coordinator : public rclcpp::Node{
   public:
     Coordinator() ;
+
+    /**
+     * @brief Sends setup messages for the turtle services.
+     * @details This method is used to initialize the necessary services for the turtles.
+    */
     int sendSetupMessages();
 
+  private:
+    /**
+     * @brief Creates all necessary turtle services.
+     * @details This method creates the services required for the turtles to operate.
+    */
     int createTurtleServices();
-
+    /**
+     * @brief Creates all necessary arm services.
+     * @details This method creates the services required for the arms to operate.
+    */
     int createArmServices();
 
-  private:
+    /**
+    * @brief Callback for turtle arrival notifications.
+    *
+    * This function is invoked when a turtle arrives. It retrieves the corresponding turtle proxy from
+    * the registered turtles using the turtleId in the request, updates its position based on the request,
+    * and acknowledges the request.
+    *
+    * @param request Shared pointer to the request containing the turtleId and new turtle position.
+    * @param response Shared pointer to the response where the acknowledgement (ack) is set.
+    */
+    void notifyTurtleArrivalCallback(const std::shared_ptr<NotifyTurtleArrival::Request> request,
+            std::shared_ptr<NotifyTurtleArrival::Response> response);
+    /**
+    * @brief Callback for initial turtle position notifications.
+    *
+    * This function is invoked when a new turtle is initialized. It creates a new TurtleProxy with the
+    * specified initial position, assigns a new turtle id (currently a placeholder), registers the turtle,
+    * and responds with the assigned turtle id.
+    *
+    * @param request Shared pointer to the request containing the initial turtle position.
+    * @param response Shared pointer to the response where the new turtle's id is returned.
+    */
+    void notifyTurtleInitialPositionCallback(const std::shared_ptr<NotifyTurtleInitialPosition::Request> request,
+            std::shared_ptr<NotifyTurtleInitialPosition::Response> response);
+    /**
+    * @brief Callback for object movement notifications.
+    *
+    * This function processes movement requests for objects. It retrieves the turtle proxy corresponding
+    * to the turtleId from the request, sets the cargo color if not already set, and updates the cargo amount.
+    * Depending on whether the turtle becomes full or empty, additional actions are suggested via TODO comments.
+    *
+    * @param request Shared pointer to the request containing object movement details such as turtleId,
+    *                object color, and difference in object amount.
+    * @param response Shared pointer to the response where the acknowledgement (ack) is set based on the update.
+    */
+    void notifyObjectMovementCallback(const std::shared_ptr<NotifyObjectMovement::Request> request,
+            std::shared_ptr<NotifyObjectMovement::Response> response);
+    /**
+    * @brief Callback for arm finished notifications.
+    *
+    * This function is invoked when an arm finished event occurs. Currently, it simply acknowledges the event.
+    *
+    * @param request Shared pointer to the request indicating that the arm has finished its operation.
+    * @param response Shared pointer to the response where the acknowledgement (ack) is set.
+    */
+    void notifyArmFinishedCallback(const std::shared_ptr<NotifyArmFinished::Request> request,
+            std::shared_ptr<NotifyArmFinished::Response> response);
+
+    /**
+     * @var The map of registered turtles.
+     * @details This map stores all the turtles that are registered with the
+     * system through the turtleInitialPosition service
+    */
     map<int,TurtleProxy> registeredTurtles;
     rclcpp::CallbackGroup::SharedPtr service_callback_group_;
 

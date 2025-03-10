@@ -25,6 +25,7 @@ include_directories(include/coordinator/)
 add_executable(coordinator_node
   src/coordinator.cpp
   src/coordinator_main.cpp
+  src/turtle_proxy.cpp
   )
 ament_target_dependencies(coordinator_node arm_coordinator_interface turtle_coordinator_interface rclcpp std_msgs)
 
