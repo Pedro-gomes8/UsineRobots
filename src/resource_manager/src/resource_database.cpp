@@ -5,7 +5,7 @@
 #include <string.h>
 #include <semaphore.h>
 
-#include "resource_database.h"
+#include "resource_database.hpp"
 
 using namespace std;
 
@@ -26,16 +26,6 @@ struct ResourceDataBase_t{
   int owner[MAX_RESOURCE_ID];
   sem_t interest[MAX_RESOURCE_ID];
 };
-
-/**
- * @brief Register a resource that HAS NOT YET been initialized
- *
- * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to lock.
- * @return 0 if the lock was acquired successfully, or a negative value on failure.
- * @note does not manage access to the database
- */
-int registerResource(ResourceDataBase_t* database, int ressourceId);
 
 /**
  * @brief Initializes the resource database.
@@ -147,15 +137,25 @@ int releaseResource(ResourceDataBase_t *database, int ressourceId, int requester
  *
  * @param[in] database Pointer to the resource database instance.
  * @param[in] ressourceId ID of the resource to wait for.
+ * @param[in] ammount The ammount of times this resource can be unlocked without consequences
  * @return 0 when the resource becomes available, or a negative value on failure.
  */
 int waitResource(ResourceDataBase_t* database, int ressourceId){
   return sem_wait(&(database->interest[ressourceId]));
 }
 
-int registerResource(ResourceDataBase_t* database, int ressourceId){
+/**
+ * @brief Register a resource that HAS NOT YET been initialized
+ *
+ * @param[in] database Pointer to the resource database instance.
+ * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] ammount The ammount of times this resource can be unlocked without consequences
+ * @return 0 if the lock was acquired successfully, or a negative value on failure.
+ * @note does not manage access to the database
+ */
+int registerResource(ResourceDataBase_t* database, int ressourceId, int ammount){
     database->registered[ressourceId] = true;
-    database->availability[ressourceId] = 1;
+    database->availability[ressourceId] = ammount;
 
     return 0;
 }

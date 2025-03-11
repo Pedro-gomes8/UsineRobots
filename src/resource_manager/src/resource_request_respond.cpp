@@ -1,8 +1,8 @@
 #include <iostream>
 #include <pthread.h>
 #include <stdlib.h>
-#include "resource_request_respond.h"
-#include "resource_database_proxy.h"
+#include "resource_request_respond.hpp"
+#include "resource_database_proxy.hpp"
 
 using namespace std;
 

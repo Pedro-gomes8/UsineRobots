@@ -3,8 +3,8 @@
 #include <semaphore.h>
 #include <stdlib.h>
 
-#include "resource_database.h"
-#include "resource_database_proxy.h"
+#include "resource_database.hpp"
+#include "resource_database_proxy.hpp"
 
 /**
  * @brief simple wrapper around the array implementation of the resource
@@ -112,4 +112,18 @@ int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId, int
  */
 int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId){
   return waitResource(database->database, ressourceId);
+}
+
+/**
+ * @brief Register a resource that HAS NOT YET been initialized
+ *
+ * @param[in] database Pointer to the resource database instance.
+ * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] ammount The ammount of times this resource can be unlocked without consequences
+ * @return 0 if the lock was acquired successfully, or a negative value on failure.
+ * @note does not manage access to the database
+ */
+int registerResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId, int ammount){
+    registerResource(database->database, ressourceId, ammount);
+    return 0;
 }

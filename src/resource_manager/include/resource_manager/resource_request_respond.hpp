@@ -8,7 +8,7 @@
 #ifndef RESOURCE_REQUEST_RESPOND_H_
 #define RESOURCE_REQUEST_RESPOND_H_
 
-#include "resource_database_proxy.h"
+#include "resource_database_proxy.hpp"
 
 /**
  * @brief Enum representing different types of resource requests.
