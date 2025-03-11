@@ -13,6 +13,9 @@ coordinator_interface:
 arm_coordinator_interface:
 	colcon build --packages-select arm_coordinator_interface
 
+turtle_interface:
+	colcon build --packages-select turtle_interface
+
 turtle_coordinator_interface:
 	colcon build --packages-select turtle_coordinator_interface
 

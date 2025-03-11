@@ -1,2 +1,0 @@
-int32 turtle_init_position
-int32 turtle_end_position
