@@ -14,9 +14,9 @@ struct ColorRange {
 };
 
 // NOTE: Red in HSV often needs two ranges due to wrap-around near Hue=180 [STACKOVERFLOW]
-ColorRange RED_RANGE_1   = {cv::Scalar(0,   130, 130), cv::Scalar(10,  255, 255)};  
-ColorRange RED_RANGE_2   = {cv::Scalar(170, 130, 130), cv::Scalar(180, 255, 255)};
-ColorRange BLUE_RANGE    = {cv::Scalar(100, 150, 100), cv::Scalar(140, 255, 255)}; 
+ColorRange RED_RANGE_1   = {cv::Scalar(0,   100, 100), cv::Scalar(10,  255, 255)};  
+ColorRange RED_RANGE_2   = {cv::Scalar(170, 100, 100), cv::Scalar(180, 255, 255)};
+ColorRange BLUE_RANGE    = {cv::Scalar(100, 65, 65), cv::Scalar(140, 255, 255)}; 
 
 // Apply color thresholding to an image and return the resulting binary mask
 cv::Mat thresholdColor(const cv::Mat &bgr, const ColorRange &range) {
@@ -65,7 +65,7 @@ int main() {
             cv::Mat colorMat(cv::Size(WIDTH, HEIGHT), CV_8UC3,
                              (void*)colorFrame.get_data(), cv::Mat::AUTO_STEP);
 
-            // B) Create masks for red and blue
+            // Create masks for red and blue
             // For red, combine two masks (lower range + upper range) (FROM the WRAP AROUND around 180)
             cv::Mat redMask1 = thresholdColor(colorMat, RED_RANGE_1);
             cv::Mat redMask2 = thresholdColor(colorMat, RED_RANGE_2);
@@ -96,7 +96,7 @@ int main() {
             // For each contour, compute bounding circle or bounding box
             for (auto &contour : contours) {
                 double area = cv::contourArea(contour);
-                if (area < 230.0) { // skip small noise
+                if (area < 200.0) { // skip small noise
                     continue;
                 }
 
@@ -123,7 +123,7 @@ int main() {
                             // opencv has origin in the upper left corner 0,0. So we need to filter out negative values
                             if (xx >= 0 && xx < WIDTH && yy >= 0 && yy < HEIGHT) {
                                 float dist = depthFrame.get_distance(xx, yy);
-                                if (dist > 0.0f && dist < 50.0f) {
+                                if (dist > 0.0f && dist < 100.0f) {
                                     sumDepth += dist;
                                     depthCount++;
                                 }
@@ -156,7 +156,7 @@ int main() {
                              cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
             for (auto &contour : contours) {
                 double area = cv::contourArea(contour);
-                if (area < 150.0) continue;
+                if (area < 200.0) continue;
 
                 cv::Moments m = cv::moments(contour);
                 if (m.m00 > 0) {
@@ -173,7 +173,7 @@ int main() {
                             int yy = cy + dy;
                             if (xx >= 0 && xx < WIDTH && yy >= 0 && yy < HEIGHT) {
                                 float dist = depthFrame.get_distance(xx, yy);
-                                if (dist > 0.0f && dist < 50.0f) {
+                                if (dist > 0.0f && dist < 100.0f) {
                                     sumDepth += dist;
                                     depthCount++;
                                 }
