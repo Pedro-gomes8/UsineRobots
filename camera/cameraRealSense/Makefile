@@ -1,4 +1,5 @@
-SRC=src/*
+SRC=src/main.cpp src/RealSense.cpp
+
 
 all: build/test
 CFLAGS=-Wall -Wextra -Werror -Wpedantic
