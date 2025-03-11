@@ -50,7 +50,7 @@ class RobotTriage(NiryoRobot):
         :param pose: PoseObject: The target pose for the robot
         :return: PoseObject: The current pose of the robot
         '''
-        self.__log(f"Observing pose: {self.observePosition}")
+        self.__log(f"Observing this pose: {self.observePosition}")
         joints = self.inverse_kinematics(self.observePosition)
         self.move(joints)
         time.sleep(0.5)
@@ -69,7 +69,7 @@ class RobotTriage(NiryoRobot):
         obj_found, shape_obj, color_ret = self.vision_pick(self.workspace_name,height_offset=heightOffset,shape=shape,color=color)
         self.__log(f"Object found: {obj_found}")
         self.observe()
-        return obj_found
+        return obj_found, color_ret
     
     def placeObject(self,pose : PoseObject):
         '''
@@ -78,7 +78,33 @@ class RobotTriage(NiryoRobot):
         :param pose: PoseObject: The target pose for placing the object
         '''
         self.__log(f"Placing object at pose: {pose}")
-        jointsUp = self.inverse_kinematics(pose)
+        poseError = False
+        try:
+            jointsUp = self.inverse_kinematics(pose)
+        except:
+            poseError = True
+            while poseError:
+            	self.__log(f"Pose not reachable, recalculating pose {pose}")
+            	isPoseXPositive = pose.x >= 0
+            	isPoseYPositive = pose.y >= 0
+            	if pose.x != 0:
+                    if isPoseXPositive:
+                        pose.x -= 0.01
+                    else:
+                        pose.x += 0.01
+            	if pose.y != 0:
+                    if isPoseYPositive:
+                        pose.y -= 0.01
+                    else:
+                        pose.y += 0.01
+            	try:
+                    jointsUp = self.inverse_kinematics(pose)
+                    poseError = False
+            	except:
+                    poseError = True
+            
+        # self.move(pose.x/2.0, pose.y/2.0, pose.z, pose.roll,pose.pitch,pose.yaw)
+        # time.sleep(0.5)
         self.move(jointsUp)
         self.__log(f"Arrived at: {self.get_pose()}")
     
