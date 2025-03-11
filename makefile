@@ -10,14 +10,11 @@ coordinator:
 coordinator_interface:
 	colcon build --packages-select coordinator_interface
 
-arm_coordinator_interface:
-	colcon build --packages-select arm_coordinator_interface
+arm_interface:
+	colcon build --packages-select arm_interface
 
 turtle_interface:
 	colcon build --packages-select turtle_interface
-
-turtle_coordinator_interface:
-	colcon build --packages-select turtle_coordinator_interface
 
 resource_manager_interface:
 	colcon build --packages-select resource_manager_interface

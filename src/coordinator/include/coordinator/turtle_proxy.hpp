@@ -9,6 +9,8 @@
 #ifndef TURTLE_PROXY_H_
 #define TURTLE_PROXY_H_
 #include "turtle.h"
+#include "rclcpp/rclcpp.hpp"
+#include <memory>
 #include <string>
 
 using namespace std;
@@ -24,7 +26,6 @@ using namespace std;
  */
 class TurtleProxy{
   public:
-
     /**
      * @brief Constructor for TurtleProxy.
      *
@@ -34,8 +35,9 @@ class TurtleProxy{
      * @param position The initial position of the turtle.
      * @param contentColor The initial cargo color of the turtle.
      * @param cargoLimit The maximum capacity of the turtle's cargo.
+     * @param node The pointer to the node that's using this proxy
      */
-    TurtleProxy(int turtleId,TurtlePosition_e position, string contentColor, int cargoLimit);
+    TurtleProxy(int turtleId,TurtlePosition_e position, string contentColor, int cargoLimit,shared_ptr<rclcpp::Node> node);
 
     /**
      * @brief Changes the turtle's position.
@@ -112,6 +114,15 @@ class TurtleProxy{
      */
     int requestCrossing(TurtlePosition_e position);
 
+    /**
+    * @brief Return a position that is on the given list that is not occupied by any
+    * of the registered turtles
+    *
+    * This function is invoked whenever a turtle has to switch sides. When a turtle
+    * takes a resource of a place in one of the sides, it's also necessary to
+    * determine which of the sides it has locked
+    * @param desiredPositions The list of positions that'll be filtered
+    */
     TurtlePosition_e getPosition();
 
   private:
@@ -120,7 +131,7 @@ class TurtleProxy{
     TurtlePosition_e position;
     string contentColor;
     int cargoLimit;
-
+    shared_ptr<rclcpp::Node> node;
 };
 
 #endif // TURTLE_PROXY_H_

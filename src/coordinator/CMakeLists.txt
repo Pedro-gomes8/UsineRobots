@@ -11,7 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-find_package(arm_coordinator_interface REQUIRED)
+find_package(arm_interface REQUIRED)
 find_package(turtle_interface REQUIRED)
 find_package(resource_manager_interface REQUIRED)
 find_package(coordinator_interface REQUIRED)
@@ -31,10 +31,15 @@ add_executable(coordinator_node
   src/resource_manager_proxy.cpp
   )
 
-ament_target_dependencies(coordinator_node coordinator_interface resource_manager_interface arm_coordinator_interface turtle_interface rclcpp std_msgs)
+ament_target_dependencies(coordinator_node
+  coordinator_interface
+  resource_manager_interface
+  arm_interface
+  turtle_interface
+  rclcpp std_msgs)
 
 target_link_libraries(coordinator_node turtle_interface::turtle_interface_lib)
-target_link_libraries(coordinator_node arm_coordinator_interface::arm_coordinator_interface_lib)
+target_link_libraries(coordinator_node arm_interface::arm_interface_lib)
 target_link_libraries(coordinator_node resource_manager_interface::resource_manager_interface_lib)
 target_link_libraries(coordinator_node rosidl_typesupport_cpp::rosidl_typesupport_cpp)
 

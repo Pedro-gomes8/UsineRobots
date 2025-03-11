@@ -6,7 +6,7 @@
 #include "arm_proxy.hpp"
 
 // dependencies from other project packages
-#include "arm.h"
+#include "arm_interface.hpp"
 
 // outside dependencies
 #include <memory>
@@ -35,8 +35,15 @@ Coordinator::Coordinator(): Node("Coordinator"), inputArm(INPUT_ARM), outputArm(
         RCLCPP_INFO(this->get_logger(), "Service is ready.");
 }
 
+/**
+ * @brief Function to initialize proxies
+ *
+ * Initializes the proxies used by the coordinator
+ */
 int Coordinator::init(){
     (void)this->resourceManager.init(shared_from_this());
+    (void)this->inputArm.init(shared_from_this());
+    (void)this->outputArm.init(shared_from_this());
     return 0;
 }
 
@@ -170,11 +177,11 @@ void Coordinator::notifyTurtleInitialPositionCallback(const std::shared_ptr<Noti
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Setting up new Turtle");
     enum TurtlePosition_e newTurtlePosition = static_cast<TurtlePosition_e>(request->turtle_position);
     int newId = this->getNewValidId();
-    TurtleProxy newTurtle = TurtleProxy(newId, newTurtlePosition, NO_COLOR, MAX_TURTLE_CAPACITY);
+    TurtleProxy newTurtle = TurtleProxy(newId, newTurtlePosition, NO_COLOR, MAX_TURTLE_CAPACITY, shared_from_this());
 
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Locking place resource of new Turtle");
     // lock respective resource
-    if(newTurtlePosition == INPUT_SIDE1 || newTurtlePosition == INPUT_SIDE1){
+    if(newTurtlePosition == INPUT_SIDE1 || newTurtlePosition == INPUT_SIDE2){
         (void)this->resourceManager.lockResource(RESOURCE_INPUT_SIDE);
     }
     else{
@@ -268,11 +275,25 @@ void Coordinator::notifyArmFinishedCallback(const std::shared_ptr<NotifyArmFinis
     response->ack = 0;
 }
 
+/**
+* @brief Function that generates a unique id to assign to a connecting element
+*
+* This function is invoked whenever a new turtle connects to the coordinator
+*/
 int Coordinator::getNewValidId(){
     this->validId +=1;
     return this->validId;
 }
 
+/**
+* @brief Return a position that is on the given list that is not occupied by any
+* of the registered turtles
+*
+* This function is invoked whenever a turtle has to switch sides. When a turtle
+* takes a resource of a place in one of the sides, it's also necessary to
+* determine which of the sides it has locked
+* @param desiredPositions The list of positions that'll be filtered
+*/
 TurtlePosition_e Coordinator::getAvailablePosition(vector<TurtlePosition_e> desiredPositions){
     //TODO: unit test this
     unordered_set<TurtlePosition_e> occupiedPositions;

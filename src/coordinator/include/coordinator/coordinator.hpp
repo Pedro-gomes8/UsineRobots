@@ -34,8 +34,19 @@ using NotifyTurtleInitialPosition = coordinator_interface::srv::NotifyTurtleInit
  */
 class Coordinator : public rclcpp::Node{
   public:
+    /**
+    * @brief Constructor for the Coordinator node.
+    *
+    * Initializes the Coordinator node with a "Coordinator" name, creates a reentrant callback group,
+    * sets up the arm and turtle services, and sends setup messages.
+    */
     Coordinator();
 
+    /**
+    * @brief Function to initialize proxies
+    *
+    * Initializes the proxies used by the coordinator
+    */
     int init();
 
     enum TurtlePosition_e getFreePositionFromResource();
@@ -100,8 +111,22 @@ class Coordinator : public rclcpp::Node{
     void notifyArmFinishedCallback(const std::shared_ptr<NotifyArmFinished::Request> request,
             std::shared_ptr<NotifyArmFinished::Response> response);
 
+    /**
+    * @brief Function that generates a unique id to assign to a connecting element
+    *
+    * This function is invoked whenever a new turtle connects to the coordinator
+    */
     int getNewValidId();
 
+    /**
+    * @brief Return a position that is on the given list that is not occupied by any
+    * of the registered turtles
+    *
+    * This function is invoked whenever a turtle has to switch sides. When a turtle
+    * takes a resource of a place in one of the sides, it's also necessary to
+    * determine which of the sides it has locked
+    * @param desiredPositions The list of positions that'll be filtered
+    */
     TurtlePosition_e getAvailablePosition(vector<TurtlePosition_e> desiredPositions);
 
     /**

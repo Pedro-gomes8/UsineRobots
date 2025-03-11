@@ -9,6 +9,9 @@
  */
 
 #include "turtle_proxy.hpp"
+#include <memory>
+
+using namespace std;
 
 /**
  * @brief Constructor for TurtleProxy.
@@ -19,10 +22,12 @@
  * @param position The initial position of the turtle.
  * @param contentColor The initial cargo color.
  * @param cargoLimit The maximum cargo capacity.
+ * @param node The pointer to the node that's using this proxy
  */
-TurtleProxy::TurtleProxy(int turtleId,TurtlePosition_e position, string contentColor, int cargoLimit)
-    : turtleId(turtleId),position(position), contentColor(contentColor), cargoLimit(cargoLimit), cargoAmmount(0)
+TurtleProxy::TurtleProxy(int turtleId,TurtlePosition_e position, string contentColor, int cargoLimit, shared_ptr<rclcpp::Node> node)
+    : turtleId(turtleId),position(position), contentColor(contentColor), cargoLimit(cargoLimit), cargoAmmount(0), node(node)
 {
+    // TODO: initialize possible clients
 }
 
 /**
