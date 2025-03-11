@@ -47,7 +47,6 @@ ResourceDataBase_t *initResourceDataBase() {
 
   for(int i=0; i<MAX_RESOURCE_ID; i++){
     database->owner[i] = -1;
-    sem_init(&(database->interest[i]),0,1);
   }
 
   return database;
@@ -109,10 +108,6 @@ int attemptLockResource(ResourceDataBase_t *database, int ressourceId, int reque
  * @return 0 on success, or a negative value on failure.
  */
 int releaseResource(ResourceDataBase_t *database, int ressourceId, int requesterId) {
-  if (database->availability[ressourceId] == 1){
-    return -1;
-  }
-
   // only the owner can unlock it
   if(requesterId != database->owner[ressourceId]){
     return -1;
@@ -156,6 +151,7 @@ int waitResource(ResourceDataBase_t* database, int ressourceId){
 int registerResource(ResourceDataBase_t* database, int ressourceId, int ammount){
     database->registered[ressourceId] = true;
     database->availability[ressourceId] = ammount;
+    sem_init(&(database->interest[ressourceId]),0,ammount);
 
     return 0;
 }

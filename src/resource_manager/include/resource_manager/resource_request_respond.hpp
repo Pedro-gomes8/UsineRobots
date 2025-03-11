@@ -10,6 +10,7 @@
 
 #include "resource_database_proxy.hpp"
 
+//TODO: move this to interface
 /**
  * @brief Enum representing different types of resource requests.
  */

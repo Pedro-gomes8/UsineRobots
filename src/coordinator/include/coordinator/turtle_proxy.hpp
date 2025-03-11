@@ -108,10 +108,11 @@ class TurtleProxy{
      *
      * @return int Status code indicating success (typically 0) or an error code.
      * @note the notifyTurtleArrival service will be used once the turtle has
-     * arrived on the otherside to set the new position, in the meanwhile, the
-     * turtleProxy's position is set to UNKOWN
+     * arrived on the otherside to set the new position
      */
-    int requestCrossing();
+    int requestCrossing(TurtlePosition_e position);
+
+    TurtlePosition_e getPosition();
 
   private:
     int turtleId;

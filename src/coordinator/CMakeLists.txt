@@ -11,9 +11,9 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-find_package(resource_manager  REQUIRED)
 find_package(arm_coordinator_interface REQUIRED)
 find_package(turtle_coordinator_interface REQUIRED)
+find_package(resource_manager_interface REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -26,21 +26,19 @@ add_executable(coordinator_node
   src/coordinator.cpp
   src/coordinator_main.cpp
   src/turtle_proxy.cpp
+  src/arm_proxy.cpp
+  src/resource_manager_proxy.cpp
   )
-ament_target_dependencies(coordinator_node arm_coordinator_interface turtle_coordinator_interface rclcpp std_msgs)
+ament_target_dependencies(coordinator_node resource_manager_interface arm_coordinator_interface turtle_coordinator_interface rclcpp std_msgs)
 
 target_link_libraries(coordinator_node turtle_coordinator_interface::turtle_coordinator_interface_lib)
 target_link_libraries(coordinator_node arm_coordinator_interface::arm_coordinator_interface_lib)
+target_link_libraries(coordinator_node resource_manager_interface::resource_manager_interface_lib)
 target_link_libraries(coordinator_node rosidl_typesupport_cpp::rosidl_typesupport_cpp)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
   set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()

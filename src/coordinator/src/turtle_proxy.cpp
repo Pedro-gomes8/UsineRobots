@@ -119,11 +119,12 @@ int TurtleProxy::changeCargoType(string cargoColor) {
  * arrived on the otherside to set the new position, in the meanwhile, the
  * turtleProxy's position is set to UNKOWN
  */
-int TurtleProxy::requestCrossing(){
+int TurtleProxy::requestCrossing(TurtlePosition_e position){
     //TODO: implement
-    // TODO: take position on the other side resource
-    // TODO: determine which position is free
-    // TODO: take corridor resource on the other side
-    // TODO: send turtle to the OUTPUT side
-    return -1;
+    return 0;
+}
+
+
+TurtlePosition_e TurtleProxy::getPosition(){
+    return this->position;
 }

@@ -1,5 +1,14 @@
+// dependencies from the current package
 #include "coordinator.hpp"
 #include "turtle_proxy.hpp"
+#include "resource_manager_proxy.hpp"
+#include "resource_manager_interface.hpp"
+#include "arm_proxy.hpp"
+
+// dependencies from other project packages
+#include "arm.h"
+
+// outside dependencies
 #include <memory>
 #include <thread>
 #include <iostream>
@@ -14,28 +23,21 @@ using namespace std;
  * Initializes the Coordinator node with a "Coordinator" name, creates a reentrant callback group,
  * sets up the arm and turtle services, and sends setup messages.
  */
-Coordinator::Coordinator(): Node("Coordinator"){
+Coordinator::Coordinator(): Node("Coordinator"), inputArm(INPUT_ARM), outputArm(OUTPUT_ARM){
         // Create a callback group
         service_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-
-        // TODO: create a way to track resource ownership
-        // TODO: setup interface between coordinator and resource manager
 
         (void)this->createArmServices();
         (void)this->createTurtleServices();
 
+        this->validId = 0;
+
         RCLCPP_INFO(this->get_logger(), "Service is ready.");
 }
-/**
- * @brief Sends setup messages.
- *
- * This function is intended to send setup messages during initialization.
- * Currently, it returns -1 as a placeholder.
- *
- * @return int Returns -1 as a temporary placeholder.
- */
-int Coordinator::sendSetupMessages(){
-    return -1;
+
+int Coordinator::init(){
+    (void)this->resourceManager.init(shared_from_this());
+    return 0;
 }
 
 /**
@@ -132,6 +134,16 @@ void Coordinator::notifyTurtleArrivalCallback(const std::shared_ptr<NotifyTurtle
 
     // select connecting turtle through request->turtleId
     TurtleProxy turtle = it->second;
+
+    // releasing resources
+    if(turtle.getPosition() == INPUT_SIDE1 || turtle.getPosition() == INPUT_SIDE1){
+        (void)this->resourceManager.releaseResource(RESOURCE_INPUT_SIDE);
+    }
+    else{
+        (void)this->resourceManager.releaseResource(RESOURCE_OUTPUT_SIDE);
+    }
+    (void)this->resourceManager.releaseResource(RESOURCE_CORRIDOR);
+
     enum TurtlePosition_e newTurtlePosition = static_cast<TurtlePosition_e>(request->turtle_position);
 
     // updating turtles position
@@ -155,13 +167,25 @@ void Coordinator::notifyTurtleArrivalCallback(const std::shared_ptr<NotifyTurtle
 void Coordinator::notifyTurtleInitialPositionCallback(const std::shared_ptr<NotifyTurtleInitialPosition::Request> request,
         std::shared_ptr<NotifyTurtleInitialPosition::Response> response){
     // Creating a new turtle proxy
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Setting up new Turtle");
     enum TurtlePosition_e newTurtlePosition = static_cast<TurtlePosition_e>(request->turtle_position);
-    int newId = -1; // TODO: generate new id
+    int newId = this->getNewValidId();
     TurtleProxy newTurtle = TurtleProxy(newId, newTurtlePosition, NO_COLOR, MAX_TURTLE_CAPACITY);
+
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Locking place resource of new Turtle");
+    // lock respective resource
+    if(newTurtlePosition == INPUT_SIDE1 || newTurtlePosition == INPUT_SIDE1){
+        (void)this->resourceManager.lockResource(RESOURCE_INPUT_SIDE);
+    }
+    else{
+        (void)this->resourceManager.lockResource(RESOURCE_OUTPUT_SIDE);
+    }
+
 
     // include into turtle proxy map
     this->registeredTurtles.insert({newId, newTurtle});
 
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "finished initial seting up turtle %d", newId);
     // respond with turtle's id
     response->turtle_id = newId;
 }
@@ -202,12 +226,23 @@ void Coordinator::notifyObjectMovementCallback(const std::shared_ptr<NotifyObjec
     }
 
     (void)turtle.changeCargoAmmount(request->obj_diff);
-    if(turtle.isFull() || turtle.isEmpty()){
-        turtle.requestCrossing();
-        // TODO: take position on the other side resource
-        // TODO: determine which position is free
-        // TODO: take corridor resource on the other side
-        // TODO: send turtle to the OUTPUT side
+    if(turtle.isFull()){
+        (void)this->resourceManager.lockResource(RESOURCE_OUTPUT_SIDE);
+        TurtlePosition_e destination = this->getAvailablePosition({OUTPUT_SIDE1, OUTPUT_SIDE2});
+
+        (void)this->resourceManager.lockResource(RESOURCE_CORRIDOR);
+
+        turtle.requestCrossing(destination);
+        response->ack = 1;
+    }
+
+    else if(turtle.isEmpty()){
+        (void)this->resourceManager.lockResource(RESOURCE_OUTPUT_SIDE);
+        TurtlePosition_e destination = this->getAvailablePosition({INPUT_SIDE1, INPUT_SIDE2});
+
+        (void)this->resourceManager.lockResource(RESOURCE_CORRIDOR);
+
+        turtle.requestCrossing(destination);
         response->ack = 1;
     }
 
@@ -231,4 +266,29 @@ void Coordinator::notifyArmFinishedCallback(const std::shared_ptr<NotifyArmFinis
 
     RCLCPP_INFO(this->get_logger(), "received arm finished request arm_type=%d ammount_moved_objects=%d", request->arm_type, request->ammount_moved_objects);
     response->ack = 0;
+}
+
+int Coordinator::getNewValidId(){
+    this->validId +=1;
+    return this->validId;
+}
+
+TurtlePosition_e Coordinator::getAvailablePosition(vector<TurtlePosition_e> desiredPositions){
+    //TODO: unit test this
+    unordered_set<TurtlePosition_e> occupiedPositions;
+
+    // Add occupied positions from each TurtleProxy to the set.
+    for (auto& entry : this->registeredTurtles) {
+        occupiedPositions.insert(entry.second.getPosition());
+    }
+
+    // Collect positions from newPositions that are not already occupied.
+    vector<TurtlePosition_e> available;
+    for (const TurtlePosition_e& pos : desiredPositions) {
+        if (occupiedPositions.find(pos) == occupiedPositions.end()) {
+            available.push_back(pos);
+        }
+    }
+
+    return available[0];
 }

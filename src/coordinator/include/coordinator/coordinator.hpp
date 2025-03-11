@@ -10,6 +10,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include <list>
 #include "turtle_proxy.hpp"
+#include "arm_proxy.hpp"
+#include "resource_manager_proxy.hpp"
 
 #include "turtle_coordinator_interface/srv/notify_turtle_arrival.hpp"
 #include "turtle_coordinator_interface/srv/notify_turtle_initial_position.hpp"
@@ -36,13 +38,11 @@ using TurtleMove = turtle_coordinator_interface::msg::TurtleMove;
  */
 class Coordinator : public rclcpp::Node{
   public:
-    Coordinator() ;
+    Coordinator();
 
-    /**
-     * @brief Sends setup messages for the turtle services.
-     * @details This method is used to initialize the necessary services for the turtles.
-    */
-    int sendSetupMessages();
+    int init();
+
+    enum TurtlePosition_e getFreePositionFromResource();
 
   private:
     /**
@@ -104,12 +104,24 @@ class Coordinator : public rclcpp::Node{
     void notifyArmFinishedCallback(const std::shared_ptr<NotifyArmFinished::Request> request,
             std::shared_ptr<NotifyArmFinished::Response> response);
 
+    int getNewValidId();
+
+    TurtlePosition_e getAvailablePosition(vector<TurtlePosition_e> desiredPositions);
+
     /**
      * @var The map of registered turtles.
      * @details This map stores all the turtles that are registered with the
      * system through the turtleInitialPosition service
     */
     map<int,TurtleProxy> registeredTurtles;
+    int validId;
+
+    ArmProxy inputArm;
+    ArmProxy outputArm;
+
+    ResourceManagerProxy resourceManager;
+
+
     rclcpp::CallbackGroup::SharedPtr service_callback_group_;
 
     rclcpp::Service<NotifyTurtleArrival>::SharedPtr turtleArrivalService;
