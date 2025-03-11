@@ -45,7 +45,7 @@ class RealSense {
     void getContours(cv::Mat &mask, std::string maskColor, cv::Mat &colorMat, rs2::depth_frame &depthFrame);
 
     public:
-    RealSense(int width = 1280, int height = 720, int fps = 30);
+    RealSense(int width = 640, int height = 480, int fps = 30);
     ~RealSense();
 
 

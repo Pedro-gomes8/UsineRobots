@@ -93,9 +93,9 @@ DetectedObject RealSense::getObject(int index){
 
 // #################### SCAN ####################
 int RealSense::scan(){
-    // int maxScans = 30;
+    int maxScans = 20;
     int scan = 0;
-    while(true){
+    while(scan < maxScans){
     rs2::frameset frames = pipe.wait_for_frames();
 
     // Align depth to color
@@ -120,12 +120,12 @@ int RealSense::scan(){
     cv::Mat colorMat(cv::Size(WIDTH, HEIGHT), CV_8UC3, (void*)colorFrame.get_data(), cv::Mat::AUTO_STEP);
 
     detectObjects(colorMat, depthFrame);
-
-    cv::imshow("Debug View", colorMat);
+    // DEBUG: Show colorMat
+    // cv::imshow("Debug View", colorMat);
     
-        if (cv::waitKey(1) == 27) { // ESC
-            break;
-        }
+    //     if (cv::waitKey(1) == 27) { // ESC
+    //         break;
+    //     }
         scan++;
     }
 
@@ -245,7 +245,7 @@ void RealSense::getContours(cv::Mat &mask, std::string maskColor, cv::Mat &color
 
     for (auto &c: contours){
         double area = cv::contourArea(c);
-        if (area < 400.0) {
+        if (area < 500.0) {
             continue;
         }
 
@@ -281,38 +281,38 @@ void RealSense::detectObjects(cv::Mat &colorMat, rs2::depth_frame &depthFrame){
     getContours(greenMask, "green", colorMat, depthFrame);
  
     // DEBUG: Draw objects
-    for (auto &obj : objects) {
+    // for (auto &obj : objects) {
     
-        cv::Scalar drawColor = (obj.color == "red") ? cv::Scalar(0,0,255) : cv::Scalar(255,0,0);
+    //     cv::Scalar drawColor = (obj.color == "red") ? cv::Scalar(0,0,255) : cv::Scalar(255,0,0);
 
-        // Draw center
-        cv::Point centerPt(static_cast<int>(obj.cx), static_cast<int>(obj.cy));
-        cv::circle(colorMat, centerPt, 5, drawColor, -1);
+    //     // Draw center
+    //     cv::Point centerPt(static_cast<int>(obj.cx), static_cast<int>(obj.cy));
+    //     cv::circle(colorMat, centerPt, 5, drawColor, -1);
 
-        // If it's a square, also draw orientation
-        if (obj.shape == ShapeType::SQUARE) {
-            // minAreaRect data is in obj.width / obj.height / obj.orientation
+    //     // If it's a square, also draw orientation
+    //     if (obj.shape == ShapeType::SQUARE) {
+    //         // minAreaRect data is in obj.width / obj.height / obj.orientation
             
-            float angle = obj.orientation; 
-            // For a quick line to show orientation:
-            float length = 50.0f; // line length
-            float rad    = angle * CV_PI / 180.0f;
-            cv::Point endPt(
-                centerPt.x + static_cast<int>(length * std::cos(rad)),
-                centerPt.y - static_cast<int>(length * std::sin(rad)) // y minus because screen coords invert angle
-            );
-            cv::line(colorMat, centerPt, endPt, drawColor, 2);
-        }
+    //         float angle = obj.orientation; 
+    //         // For a quick line to show orientation:
+    //         float length = 50.0f; // line length
+    //         float rad    = angle * CV_PI / 180.0f;
+    //         cv::Point endPt(
+    //             centerPt.x + static_cast<int>(length * std::cos(rad)),
+    //             centerPt.y - static_cast<int>(length * std::sin(rad)) // y minus because screen coords invert angle
+    //         );
+    //         cv::line(colorMat, centerPt, endPt, drawColor, 2);
+    //     }
         
-        char text[128];
-        if (obj.shape == ShapeType::SQUARE) {
-            std::snprintf(text, 128, "%s Square [%.1f deg], Depth=%.2f", 
-                          obj.color.c_str(), obj.orientation, obj.avgDepth);
-        } else {
-            std::snprintf(text, 128, "%s Circle R=%.1f, Depth=%.2f", 
-                          obj.color.c_str(), obj.radius, obj.avgDepth);
-        }
-        cv::putText(colorMat, text, centerPt + cv::Point(5, -5),
-                    cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255,255,255), 1);
-    }
+    //     char text[128];
+    //     if (obj.shape == ShapeType::SQUARE) {
+    //         std::snprintf(text, 128, "%s Square [%.1f deg], Depth=%.2f", 
+    //                       obj.color.c_str(), obj.orientation, obj.avgDepth);
+    //     } else {
+    //         std::snprintf(text, 128, "%s Circle R=%.1f, Depth=%.2f", 
+    //                       obj.color.c_str(), obj.radius, obj.avgDepth);
+    //     }
+    //     cv::putText(colorMat, text, centerPt + cv::Point(5, -5),
+    //                 cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255,255,255), 1);
+    // }
  }
