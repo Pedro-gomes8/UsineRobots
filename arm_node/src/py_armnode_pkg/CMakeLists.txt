@@ -8,7 +8,6 @@ find_package(example_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 set(interface_files
-  "msg/TurtleData.msg"
   "srv/TurtleBotArrived.srv"
 )
 

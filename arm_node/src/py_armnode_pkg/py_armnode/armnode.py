@@ -77,18 +77,18 @@ class ArmNed2Node(Node):
         
     # Callback function for the service -> Update the turtleBot info when it arrives
     def turtleBotArrived(self, request, response):
-        self.get_logger().info('Incoming request\nid: %d x_pos: %f y_pos: %f color: %s ' % (request.data.id, request.data.x_pos, request.data.y_pos, request.data.color))
+        self.get_logger().info('Incoming request\nid: %d x_pos: %f y_pos: %f color: %s ' % (request.id, request.x_pos, request.y_pos, request.color))
 
-        isUp = request.data.y_pos > self.get_parameter('y_pos').get_parameter_value().double_value
+        isUp = request.y_pos > self.get_parameter('y_pos').get_parameter_value().double_value
         isRight = isUp and self.get_parameter('x_direction').get_parameter_value().integer_value < 0 or not isUp and self.get_parameter('x_direction').get_parameter_value().integer_value > 0
 
-        self.get_logger().info('Incoming request\ny_pos_Arm: %f x_direction: %d x_pos_Arm: %f color: %s ' % (self.get_parameter('y_pos').get_parameter_value().double_value, self.get_parameter('x_direction').get_parameter_value().integer_value, self.get_parameter('x_pos').get_parameter_value().double_value, request.data.color))
+        self.get_logger().info('Incoming request\ny_pos_Arm: %f x_direction: %d x_pos_Arm: %f color: %s ' % (self.get_parameter('y_pos').get_parameter_value().double_value, self.get_parameter('x_direction').get_parameter_value().integer_value, self.get_parameter('x_pos').get_parameter_value().double_value, request.color))
         
         if isRight:
-            self.turtleBotRight.turtleBotArrived(request.data.x_pos, request.data.y_pos, request.data.color, request.data.id)
+            self.turtleBotRight.turtleBotArrived(request.x_pos, request.y_pos, request.color, request.id)
             self.get_logger().info('Setting Right turtleBot')
         else:
-            self.turtleBotLeft.turtleBotArrived(request.data.x_pos, request.data.y_pos, request.data.color, request.data.id)
+            self.turtleBotLeft.turtleBotArrived(request.x_pos, request.y_pos, request.color, request.id)
             self.get_logger().info('Setting Left turtleBot')
         return response
         
