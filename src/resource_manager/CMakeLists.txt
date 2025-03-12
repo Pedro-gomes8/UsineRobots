@@ -14,12 +14,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-
-# This generates an interface target named "resource_manager"
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "srv/RequestResource.srv"
-  DEPENDENCIES std_msgs
-)
+find_package(resource_manager_interface REQUIRED)
 
 include_directories(include/resource_manager/)
 
@@ -29,12 +24,8 @@ add_executable(resource_manager_node
   src/resource_database.cpp
   src/resource_database_proxy.cpp
   src/resource_request_respond.cpp)
-ament_target_dependencies(resource_manager_node rclcpp std_msgs)
-
-# Link the generated interfaces to your node so that the compile definitions
-# are applied to the proper (compilable) target.
-rosidl_target_interfaces(resource_manager_node
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+ament_target_dependencies(resource_manager_node resource_manager_interface rclcpp std_msgs)
+target_link_libraries(resource_manager_node resource_manager_interface::resource_manager_interface_lib)
 
 install(TARGETS
   resource_manager_node

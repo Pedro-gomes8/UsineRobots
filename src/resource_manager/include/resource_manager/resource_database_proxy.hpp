@@ -9,7 +9,7 @@
 #ifndef RESOURCE_DATABASE_PROXY_H_
 #define RESOURCE_DATABASE_PROXY_H_
 
-#include "resource_database.h"
+#include "resource_database.hpp"
 
 /**
  * @brief Opaque structure representing a resource database proxy.
@@ -71,4 +71,14 @@ int releaseResourceProxy(ResourceDataBaseProxy_t* db_proxy, int ressourceId, int
  */
 int waitResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId);
 
+/**
+ * @brief Register a resource that HAS NOT YET been initialized
+ *
+ * @param[in] database Pointer to the resource database instance.
+ * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] ammount The ammount of times this resource can be unlocked without consequences
+ * @return 0 if the lock was acquired successfully, or a negative value on failure.
+ * @note does not manage access to the database
+ */
+int registerResourceProxy(ResourceDataBaseProxy_t* database, int ressourceId, int ammount = 1);
 #endif  // RESSOURCE_DATABASE_PROXY_H_

@@ -69,4 +69,15 @@ int releaseResource(ResourceDataBase_t* database, int ressourceId, int requester
  */
 int waitResource(ResourceDataBase_t* database, int ressourceId);
 
+/**
+ * @brief Register a resource that HAS NOT YET been initialized
+ *
+ * @param[in] database Pointer to the resource database instance.
+ * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] ammount The ammount of times this resource can be unlocked without consequences
+ * @return 0 if the lock was acquired successfully, or a negative value on failure.
+ * @note does not manage access to the database
+ */
+int registerResource(ResourceDataBase_t* database, int ressourceId, int ammount = 1);
+
 #endif  // RESSOURCE_DATABASE_H_

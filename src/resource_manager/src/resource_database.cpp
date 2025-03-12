@@ -5,7 +5,7 @@
 #include <string.h>
 #include <semaphore.h>
 
-#include "resource_database.h"
+#include "resource_database.hpp"
 
 using namespace std;
 
@@ -28,16 +28,6 @@ struct ResourceDataBase_t{
 };
 
 /**
- * @brief Register a resource that HAS NOT YET been initialized
- *
- * @param[in] database Pointer to the resource database instance.
- * @param[in] ressourceId ID of the resource to lock.
- * @return 0 if the lock was acquired successfully, or a negative value on failure.
- * @note does not manage access to the database
- */
-int registerResource(ResourceDataBase_t* database, int ressourceId);
-
-/**
  * @brief Initializes the resource database.
  *
  * Allocates and initializes a new instance of the resource database.
@@ -57,7 +47,6 @@ ResourceDataBase_t *initResourceDataBase() {
 
   for(int i=0; i<MAX_RESOURCE_ID; i++){
     database->owner[i] = -1;
-    sem_init(&(database->interest[i]),0,1);
   }
 
   return database;
@@ -119,10 +108,6 @@ int attemptLockResource(ResourceDataBase_t *database, int ressourceId, int reque
  * @return 0 on success, or a negative value on failure.
  */
 int releaseResource(ResourceDataBase_t *database, int ressourceId, int requesterId) {
-  if (database->availability[ressourceId] == 1){
-    return -1;
-  }
-
   // only the owner can unlock it
   if(requesterId != database->owner[ressourceId]){
     return -1;
@@ -147,15 +132,26 @@ int releaseResource(ResourceDataBase_t *database, int ressourceId, int requester
  *
  * @param[in] database Pointer to the resource database instance.
  * @param[in] ressourceId ID of the resource to wait for.
+ * @param[in] ammount The ammount of times this resource can be unlocked without consequences
  * @return 0 when the resource becomes available, or a negative value on failure.
  */
 int waitResource(ResourceDataBase_t* database, int ressourceId){
   return sem_wait(&(database->interest[ressourceId]));
 }
 
-int registerResource(ResourceDataBase_t* database, int ressourceId){
+/**
+ * @brief Register a resource that HAS NOT YET been initialized
+ *
+ * @param[in] database Pointer to the resource database instance.
+ * @param[in] ressourceId ID of the resource to lock.
+ * @param[in] ammount The ammount of times this resource can be unlocked without consequences
+ * @return 0 if the lock was acquired successfully, or a negative value on failure.
+ * @note does not manage access to the database
+ */
+int registerResource(ResourceDataBase_t* database, int ressourceId, int ammount){
     database->registered[ressourceId] = true;
-    database->availability[ressourceId] = 1;
+    database->availability[ressourceId] = ammount;
+    sem_init(&(database->interest[ressourceId]),0,ammount);
 
     return 0;
 }
