@@ -12,7 +12,6 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(coordinator_interface
   "srv/NotifyObjectMovement.srv"
-  "srv/NotifyArmFinished.srv"
   "srv/NotifyTurtleArrival.srv"
   "srv/NotifyTurtleInitialPosition.srv"
 )

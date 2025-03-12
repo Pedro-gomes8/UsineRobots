@@ -100,16 +100,6 @@ class Coordinator : public rclcpp::Node{
     */
     void notifyObjectMovementCallback(const std::shared_ptr<NotifyObjectMovement::Request> request,
             std::shared_ptr<NotifyObjectMovement::Response> response);
-    /**
-    * @brief Callback for arm finished notifications.
-    *
-    * This function is invoked when an arm finished event occurs. Currently, it simply acknowledges the event.
-    *
-    * @param request Shared pointer to the request indicating that the arm has finished its operation.
-    * @param response Shared pointer to the response where the acknowledgement (ack) is set.
-    */
-    void notifyArmFinishedCallback(const std::shared_ptr<NotifyArmFinished::Request> request,
-            std::shared_ptr<NotifyArmFinished::Response> response);
 
     /**
     * @brief Function that generates a unique id to assign to a connecting element

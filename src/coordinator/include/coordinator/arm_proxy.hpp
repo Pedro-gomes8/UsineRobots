@@ -9,10 +9,13 @@
 #define ARM_PROXY_H_
 
 #include "rclcpp/rclcpp.hpp"
+#include "arm_interface/srv/turtle_bot_arrived.hpp"
 #include "arm_interface.hpp"
+#include "turtle.h"
 #include <memory>
 
 using namespace std;
+using TurtleBotArrived = arm_interface::srv::TurtleBotArrived;
 
 /**
  * @class ArmProxy
@@ -43,8 +46,11 @@ class ArmProxy{
      */
     int init(shared_ptr<rclcpp::Node> node);
 
+    int notifyTurtleArrived(int turtleId, string cargoColor, float x, float y);
+
   private:
     shared_ptr<rclcpp::Node> node;
+    rclcpp::Client<TurtleBotArrived>::SharedPtr client;
     enum ArmType_e type;
 };
 

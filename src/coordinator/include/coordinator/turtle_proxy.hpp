@@ -77,6 +77,8 @@ class TurtleProxy{
      */
     bool cargoHasColor(string referenceColor);
 
+    string getCargoColor();
+
     /**
      * @brief Changes the turtle's cargo amount.
      *
@@ -124,7 +126,6 @@ class TurtleProxy{
     * @param desiredPositions The list of positions that'll be filtered
     */
     TurtlePosition_e getPosition();
-
   private:
     int turtleId;
     int cargoAmmount;
@@ -132,6 +133,7 @@ class TurtleProxy{
     string contentColor;
     int cargoLimit;
     shared_ptr<rclcpp::Node> node;
+
 };
 
 #endif // TURTLE_PROXY_H_

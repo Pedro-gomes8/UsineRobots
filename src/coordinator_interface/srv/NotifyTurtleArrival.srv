@@ -1,4 +1,6 @@
 int32 turtle_id
 int32 turtle_position
+float32 x_turtle
+float32 y_turtle
 ---
 int32 ack

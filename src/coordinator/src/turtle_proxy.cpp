@@ -109,6 +109,9 @@ int TurtleProxy::changeCargoType(string cargoColor) {
     return 0;
 }
 
+string TurtleProxy::getCargoColor(){
+    return this->contentColor;
+}
 /**
  * @brief asks the turtle to cross to the other side.
  *
@@ -122,7 +125,7 @@ int TurtleProxy::changeCargoType(string cargoColor) {
  * @return int Status code indicating success (typically 0) or an error code.
  * @note the notifyTurtleArrival service will be used once the turtle has
  * arrived on the otherside to set the new position, in the meanwhile, the
- * turtleProxy's position is set to UNKOWN
+ * turtleProxy's position is not known
  */
 int TurtleProxy::requestCrossing(TurtlePosition_e position){
     //TODO: implement

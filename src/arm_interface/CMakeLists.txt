@@ -10,8 +10,11 @@ find_package(ament_cmake REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-#rosidl_generate_interfaces(arm_coordinator_interface
-#)
+rosidl_generate_interfaces(arm__interface
+  "srv/TurtleBotArrived.srv"
+)
+
+include_directories(include/arm_interface/)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
