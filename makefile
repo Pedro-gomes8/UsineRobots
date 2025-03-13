@@ -6,7 +6,7 @@
 
 interfaces: coordinator_interface arm_interface turtle_interface resource_manager_interface
 
-nodes: coordinator resource_manager
+nodes: coordinator resource_manager custom_action_cpp
 
 run_coordinator:
 	ros2 run resource_manager resource_manager_node &
@@ -30,5 +30,8 @@ resource_manager_interface:
 resource_manager:
 	colcon build --packages-select resource_manager
 
+custom_action_cpp:
+	colcon build --packages-select custom_action_cpp
 
-# end
+clean:
+	rm -fr build log install
