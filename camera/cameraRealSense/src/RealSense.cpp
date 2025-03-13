@@ -93,7 +93,7 @@ DetectedObject RealSense::getObjectAtIdx(int index){
 
 // #################### SCAN ####################
 int RealSense::scan(){
-    int maxScans = 20;
+    int maxScans = 60;
     int scan = 0;
     while(scan < maxScans){
     rs2::frameset frames = pipe.wait_for_frames();
@@ -277,7 +277,8 @@ void RealSense::detectObjects(cv::Mat &colorMat, rs2::depth_frame &depthFrame){
     cv::dilate(greenMask, greenMask, cv::Mat(), cv::Point(-1,-1), 1);
 
     getContours(redMask, "red", colorMat, depthFrame);
-    getContours(blueMask, "blue", colorMat, depthFrame);
+    // Deactivate blue to avoid detecting robot
+    // getContours(blueMask, "blue", colorMat, depthFrame);
     getContours(greenMask, "green", colorMat, depthFrame);
  
     // DEBUG: Draw objects
@@ -305,15 +306,19 @@ void RealSense::detectObjects(cv::Mat &colorMat, rs2::depth_frame &depthFrame){
     //     }
         
     //     char text[128];
+    //     char text2[128];
     //     if (obj.shape == ShapeType::SQUARE) {
     //         std::snprintf(text, 128, "%s Square [%.1f deg], Depth=%.2f", 
     //                       obj.color.c_str(), obj.orientation, obj.avgDepth);
     //     } else {
     //         std::snprintf(text, 128, "%s Circle R=%.1f, Depth=%.2f", 
     //                       obj.color.c_str(), obj.radius, obj.avgDepth);
+    //         std::snprintf(text2,128, "Coord: (%.6f, %.6f, %.6f)",obj.Xc, obj.Yc, obj.Zc);
     //     }
     //     cv::putText(colorMat, text, centerPt + cv::Point(5, -5),
     //                 cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255,255,255), 1);
+    //     cv::putText(colorMat, text2, centerPt + cv::Point(5, 5),cv::FONT_HERSHEY_SIMPLEX, 0.5,
+    //                 cv::Scalar(255,255,255), 1);
     // }
  }
  

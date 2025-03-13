@@ -15,7 +15,7 @@ int main() {
 
     // If we found any objects, let's get data from the first one
     if (count > 0) {
-        DetectedObject obj = camera.getObject(0);
+        DetectedObject obj = camera.getObjectAtIdx(0);
 
         std::cout << "Object #0: color=" << obj.color << "\n"
                   << " shape=" << ((obj.shape == ShapeType::CIRCLE) ? "Circle" : "Square") << "\n"
