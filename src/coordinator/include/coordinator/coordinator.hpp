@@ -17,13 +17,11 @@
 #include "coordinator_interface/srv/notify_turtle_initial_position.hpp"
 
 #include "coordinator_interface/srv/notify_object_movement.hpp"
-#include "coordinator_interface/srv/notify_arm_finished.hpp"
 
 #define MAX_TURTLE_CAPACITY 5
-#define NO_COLOR "None"
+#define NO_COLOR ""
 
 using NotifyObjectMovement = coordinator_interface::srv::NotifyObjectMovement;
-using NotifyArmFinished = coordinator_interface::srv::NotifyArmFinished;
 
 using NotifyTurtleArrival = coordinator_interface::srv::NotifyTurtleArrival;
 using NotifyTurtleInitialPosition = coordinator_interface::srv::NotifyTurtleInitialPosition;
@@ -138,7 +136,6 @@ class Coordinator : public rclcpp::Node{
     rclcpp::Service<NotifyTurtleArrival>::SharedPtr turtleArrivalService;
     rclcpp::Service<NotifyTurtleInitialPosition>::SharedPtr turtleInitialPositionService;
     rclcpp::Service<NotifyObjectMovement>::SharedPtr objectMovementService;
-    rclcpp::Service<NotifyArmFinished>::SharedPtr armFinishedService;
 };
 
 #endif // COORDINATOR_H_

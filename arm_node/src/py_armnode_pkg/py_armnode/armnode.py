@@ -2,7 +2,8 @@
 
 from example_interfaces.srv import AddTwoInts
 
-from py_armnode_pkg.srv import TurtleBotArrived
+from arm_interface.srv import TurtleBotArrived
+from coordinator_interface.srv import NotifyObjectMovement
 
 import rclpy
 from rclpy.node import Node
@@ -38,23 +39,26 @@ class ArmNed2Node(Node):
         
         # setup Niryo Arm (ip should be given)
         observationPose = PoseObject(0.219, -0.008, 0.2886, 3.025, 1.346, 2.976)
-        self.robot = RobotTriage('10.10.10.10', 'SalleTpSetup', observationPose, 1)
+        self.robot = RobotTriage('172.20.10.2', 'SalleTpSetup', observationPose, 0)
         
         # setup services
         self.srv1 = self.create_service(AddTwoInts, 'add_two_ints', self.add_two_ints_callback)
-        self.srv2 = self.create_service(TurtleBotArrived, 'srv/TurtleBotArrived', self.turtleBotArrived)
+        self.srv2 = self.create_service(TurtleBotArrived, 'InputArm/TurtleBotArrived', self.turtleBotArrived)
         self.get_logger().info("Service is ready")
         
         # setup clients
-        #self.cli = self.create_client(NotifyObjectMovement, 'srv/NotifyObjectMovement')
-        #while not self.cli.wait_for_service(timeout_sec=1.0):
-        #    self.get_logger().info('service not available, waiting again...')
-        #self.get_logger().info("Client is ready")
-        #self.req = NotifyObjectMovement.Request()
+        self.cli = self.create_client(NotifyObjectMovement, 'notify_object_movement')
+        while not self.cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service not available, waiting again...')
+        self.get_logger().info("Client is ready")
+        self.req = NotifyObjectMovement.Request()
+        
+        self.client_futures = []
+        self.turtleId_futures = []
 
         self.robot.observe()
         
-        timer_period = 10  # seconds
+        timer_period = 7  # seconds
         self.timer = self.create_timer(timer_period, self.checkForObjects)
 
     def add_two_ints_callback(self, request, response):
@@ -95,25 +99,25 @@ class ArmNed2Node(Node):
     def notifyObjectMovement(self, turtle_id, obj_diff, object_color):
         self.get_logger().info('Incoming request\nturtle_id: %d obj_diff: %d object_color: %s' % (turtle_id, obj_diff, object_color))
 
-        #self.req.turtle_id = turtle_id
-        #self.req.obj_diff = obj_diff
-        #self.req.object_color = object_color
-
-        #future = self.cli.call_async(self.req)
-        #rclpy.spin_until_future_complete(self, self.future)
-
-        #if self.future.result() is not None:
-         #   self.get_logger().info('Result of object movement: for turtle_id: %d is %d' % (turtle_id, self.future.result().ack))
-            # ack = 1 means the turtleBot leaves the arm to switch side
-          #  if (self.future.result().ack == 1):
-           #     if (self.turtleBotRight.id == turtle_id):
-            #        self.turtleBotRight.turtleBotLeft()
-             #   else:
-              #      self.turtleBotLeft.turtleBotLeft()
-
-        #return self.future.result()
+        self.req.turtle_id = turtle_id
+        self.req.obj_diff = obj_diff
+        self.req.object_color = object_color
+        
+        self.client_futures.append(self.cli.call_async(self.req))
+        self.turtleId_futures.append(turtle_id)
+        return
+        
+    def turtleLeft(self, turtleId):
+        if (self.turtleBotRight.id == turtleId):
+            self.turtleBotRight.turtleBotLeft()
+            self.get_logger().info('Right turtleBot left')
+        else:
+            self.turtleBotLeft.turtleBotLeft()
+            self.get_logger().info('Left turtleBot left')
         
     def checkForObjects(self):
+        if (len(self.client_futures) > 0):
+            return
         self.get_logger().info('Checkin for objects')
         availablesColors = []
         turtleWithoutColor = False
@@ -160,7 +164,7 @@ class ArmNed2Node(Node):
                 color = "blue"
                 
             if color in availablesColors:
-                print("the color was in the list")
+                #print("the color was in the list")
                 if self.turtleBotRight.isThere and self.turtleBotRight.objectsColors == color:
                     pose = self.getPoseOverTurtle(self.turtleBotRight.id)
                     self.robot.placeObject(pose)
@@ -171,7 +175,7 @@ class ArmNed2Node(Node):
                     self.notifyObjectMovement(self.turtleBotLeft.id, 1, color)
                     
             else: 
-                print("turtles with no colors")
+                #print("turtles with no colors")
                 if self.turtleBotRight.isThere and self.turtleBotRight.objectsColors == "":
                     pose = self.getPoseOverTurtle(self.turtleBotRight.id)
                     self.robot.placeObject(pose)
@@ -214,16 +218,27 @@ class ArmNed2Node(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_service = ArmNed2Node()
+    armNode = ArmNed2Node()
 
     #lastCheck = 0
     #deltaTime = 10
     
     while rclpy.ok():
-    	rclpy.spin_once(minimal_service)
-    	#if time.time() - lastCheck > deltaTime:
-    	 #   minimal_service.checkForObjects()
-    	  #  lastCheck = time.time()
+    	rclpy.spin_once(armNode)
+    	incomplete_futures = []
+    	incomplete_ids = []
+    	index = 0
+    	for f in armNode.client_futures:
+    	    if f.done():
+    	        res = f.result()
+    	        if (res.ack == 1):
+    	            armNode.turtleLeft(armNode.turtleId_futures[index])
+    	    else:
+    	        incomplete_futures.append(f)
+    	        incomplete_ids.append(armNode.turtleId_futures[index])
+    	    index += 1
+    	armNode.client_futures = incomplete_futures
+    	armNode.turtleId_futures = incomplete_ids
     	    
     print("Shutting Down")
 

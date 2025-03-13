@@ -35,7 +35,7 @@ ArmProxy::ArmProxy(enum ArmType_e type)
  */
 int ArmProxy::init(shared_ptr<rclcpp::Node> node){
   this->node = node;
-  this->client = node->create_client<TurtleBotArrived>("turtle_bot_arrived");
+  this->client = node->create_client<TurtleBotArrived>("InputArm/TurtleBotArrived");
   return 0;
 }
 

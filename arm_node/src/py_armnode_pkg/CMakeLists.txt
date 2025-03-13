@@ -5,16 +5,8 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(example_interfaces REQUIRED)
+find_package(arm_interface REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-
-set(interface_files
-  "srv/TurtleBotArrived.srv"
-)
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-  ${interface_files}
-  DEPENDENCIES example_interfaces
-)
 
 ament_python_install_package(py_armnode)
 

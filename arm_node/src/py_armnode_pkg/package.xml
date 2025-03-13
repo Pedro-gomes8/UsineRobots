@@ -16,6 +16,8 @@
   <!-- Runtime dependencies -->
   <depend>rclpy</depend>
   <depend>example_interfaces</depend>
+  <depend>arm_interface</depend>
+  <depend>coordinator_interface</depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
 
   <!-- Testing dependencies -->
