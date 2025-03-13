@@ -2735,7 +2735,6 @@
 <ref refid="f47011a6-e562-11ef-bf6c-88f4da9a3387"/>
 <ref refid="6b723253-e55e-11ef-81ab-88f4da9a3387"/>
 <ref refid="7abd49e2-e55e-11ef-9b71-88f4da9a3387"/>
-<ref refid="af667ed3-e560-11ef-a34b-88f4da9a3387"/>
 <ref refid="8257a5e4-e55e-11ef-83ad-88f4da9a3387"/>
 <ref refid="936ee80a-e55e-11ef-8d2d-88f4da9a3387"/>
 <ref refid="34bf09b5-e560-11ef-b033-88f4da9a3387"/>
@@ -3237,37 +3236,6 @@
 </reflist>
 </presentation>
 </Include>
-<Comment id="af6679b2-e560-11ef-8c95-88f4da9a3387">
-<body>
-<val>were is the robot supposed to stop ? Besides the arm or in front of it ?
-</val>
-</body>
-<presentation>
-<reflist>
-<ref refid="af667ed3-e560-11ef-a34b-88f4da9a3387"/>
-</reflist>
-</presentation>
-</Comment>
-<CommentItem id="af667ed3-e560-11ef-a34b-88f4da9a3387">
-<matrix>
-<val>(1.0, 0.0, 0.0, 1.0, 394.0107745638757, 809.6280738289838)</val>
-</matrix>
-<top-left>
-<val>(0.0, 0.0)</val>
-</top-left>
-<width>
-<val>136.636766821761</val>
-</width>
-<height>
-<val>110.0</val>
-</height>
-<diagram>
-<ref refid="2faf9f26-e55e-11ef-974f-88f4da9a3387"/>
-</diagram>
-<subject>
-<ref refid="af6679b2-e560-11ef-8c95-88f4da9a3387"/>
-</subject>
-</CommentItem>
 <BlockItem id="0ba4306a-e561-11ef-ba9b-88f4da9a3387">
 <matrix>
 <val>(1.0, 0.0, 0.0, 1.0, 375.89016361779795, 353.96131541838025)</val>
