@@ -10,6 +10,7 @@
 
 #include "turtle_proxy.hpp"
 #include <memory>
+#include <string>
 
 using namespace std;
 
@@ -27,7 +28,7 @@ using namespace std;
 TurtleProxy::TurtleProxy(int turtleId,TurtlePosition_e position, string contentColor, int cargoLimit, shared_ptr<rclcpp::Node> node)
     : turtleId(turtleId),position(position), contentColor(contentColor), cargoLimit(cargoLimit), cargoAmmount(0), node(node)
 {
-    // TODO: initialize possible clients
+    this->client = node->create_client<TurtleMove>("TurtleMove"+to_string(this->turtleId));
 }
 
 /**
@@ -128,8 +129,24 @@ string TurtleProxy::getCargoColor(){
  * turtleProxy's position is not known
  */
 int TurtleProxy::requestCrossing(TurtlePosition_e position){
-    //TODO: implement
-    return 0;
+
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "creating request object to notify arm");
+  shared_ptr<TurtleMove::Request> req = make_shared<TurtleMove::Request>();
+  req->turtle_id = turtleId;
+  req->turtle_position= position;
+
+  while (!this->client->wait_for_service(1s)) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+      return 0;
+    }
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+  }
+
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "request sent to arm robot");
+  auto result = client->async_send_request(req);
+
+  return 0;
 }
 
 

@@ -10,10 +10,12 @@
 #define TURTLE_PROXY_H_
 #include "turtle.h"
 #include "rclcpp/rclcpp.hpp"
+#include "turtle_interface/srv/turtle_move.hpp"
 #include <memory>
 #include <string>
 
 using namespace std;
+using TurtleMove = turtle_interface::srv::TurtleMove;
 
 /**
  * @class TurtleProxy
@@ -133,7 +135,7 @@ class TurtleProxy{
     string contentColor;
     int cargoLimit;
     shared_ptr<rclcpp::Node> node;
-
+    rclcpp::Client<TurtleMove>::SharedPtr client;
 };
 
 #endif // TURTLE_PROXY_H_
