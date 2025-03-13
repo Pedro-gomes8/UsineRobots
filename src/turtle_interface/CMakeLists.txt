@@ -11,8 +11,10 @@ find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # Generate ROS 2 interfaces
-#rosidl_generate_interfaces(turtle_interface
-#)
+rosidl_generate_interfaces(turtle_interface
+  "srv/TurtleMove.srv"
+  DEPENDENCIES std_msgs
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
