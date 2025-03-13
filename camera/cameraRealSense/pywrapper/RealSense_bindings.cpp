@@ -29,5 +29,6 @@ PYBIND11_MODULE(realsense, m) {
         .def("stop",  &RealSense::stop)
         .def("scan",  &RealSense::scan)
         .def("getObjectCount", &RealSense::getObjectCount)
-        .def("getObject",      &RealSense::getObject);
+        .def("getObjectAtIdx", &RealSense::getObjectAtIdx)
+        .def("getObjects", &RealSense::getObjects);
 }

@@ -86,10 +86,13 @@ class RealSense {
      * @param index Index of the object
      * @return Detected object 
      */
-    DetectedObject getObject(int index);
+    DetectedObject getObjectAtIdx(int index);
 
 
     void detectObjects(cv::Mat &colorMat, rs2::depth_frame &depthFrame);
+
+    std::vector<DetectedObject> getObjects();
+
 
 
 
