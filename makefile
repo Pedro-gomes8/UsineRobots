@@ -3,10 +3,11 @@
 #
 # @file
 # @version 0.1
+interfaces: coordinator_interface arm_interface turtle_interface resource_manager_interface custom_action_interfaces
+	@printf "Remember to run the command:\n"
+	@printf "source install/setup.bash\n"
 
-interfaces: coordinator_interface arm_interface turtle_interface resource_manager_interface
-
-nodes: coordinator resource_manager
+nodes: coordinator resource_manager custom_action_cpp
 
 run_coordinator:
 	ros2 run resource_manager resource_manager_node &
@@ -30,5 +31,11 @@ resource_manager_interface:
 resource_manager:
 	colcon build --packages-select resource_manager
 
+custom_action_interfaces:
+	colcon build --packages-select custom_action_interfaces
 
-# end
+custom_action_cpp:
+	colcon build --packages-select custom_action_cpp
+
+clean:
+	rm -fr build log install
