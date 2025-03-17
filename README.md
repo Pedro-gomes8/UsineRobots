@@ -7,8 +7,11 @@
 This repository contains a ROS-based setup of a robotic production line featuring:
 
 Two Niryo Ned 2 robots
+
 TurtleBot mobile robots
+
 Intel RealSense D405 depth camera
+
 OpenCV for object detection and color-based classification
 
 The system simulates an end-to-end workflow where objects of different colors are deposited, sorted, and transported between two robotic arms via TurtleBots, culminating in color-based placement.
@@ -34,9 +37,20 @@ Robot 2 picks the object from the TurtleBot, then places it at the designated co
 ### ROS Coordinator
 Manages communication between Robot 1, Robot 2, and the TurtleBot.
 Ensures tasks execute in correct order.
-System Architecture
 
 # Dependencies
 
-This library depends on ROS 2, Docker, OpenCV, IntelRealSense SDK, Pyniryo and Pybindings.
+This library depends on the following packages and libraries:
+
+ROS 2
+
+Docker
+
+OpenCV
+
+IntelRealSense SDK
+
+Pyniryo 
+
+Pybindings
 
